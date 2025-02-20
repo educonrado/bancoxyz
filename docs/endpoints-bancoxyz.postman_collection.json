@@ -11,6 +11,72 @@
 			"item": [
 				{
 					"name": "getAllClients",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response has the required fields\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('array');",
+									"    responseData.forEach(function(cliente) {",
+									"        pm.expect(cliente).to.have.property('id');",
+									"        pm.expect(cliente).to.have.property('nombre');",
+									"        pm.expect(cliente).to.have.property('genero');",
+									"        pm.expect(cliente).to.have.property('edad');",
+									"        pm.expect(cliente).to.have.property('identificacion');",
+									"        pm.expect(cliente).to.have.property('direccion');",
+									"        pm.expect(cliente).to.have.property('telefono');",
+									"        pm.expect(cliente).to.have.property('clientId');",
+									"        pm.expect(cliente).to.have.property('contrasenia');",
+									"        pm.expect(cliente).to.have.property('estado');",
+									"    });",
+									"});",
+									"",
+									"",
+									"pm.test(\"Nombre, genero, identificacion, direccion, telefono, clientId, and contrasenia are nullable\", function () {",
+									"  const responseData = pm.response.json();",
+									"  ",
+									"  responseData.forEach(function(item) {",
+									"    pm.expect(item).to.be.an('object');",
+									"    pm.expect(item.nombre).to.be.null;",
+									"    pm.expect(item.genero).to.be.null;",
+									"    pm.expect(item.identificacion).to.be.null;",
+									"    pm.expect(item.direccion).to.be.null;",
+									"    pm.expect(item.telefono).to.be.null;",
+									"    pm.expect(item.clientId).to.be.null;",
+									"    pm.expect(item.contrasenia).to.be.null;",
+									"  });",
+									"});",
+									"",
+									"",
+									"pm.test(\"Edad is a non-negative integer\", function () {",
+									"  const responseData = pm.response.json();",
+									"",
+									"  responseData.forEach(function(cliente) {",
+									"    pm.expect(cliente.edad).to.be.a('number').and.to.be.at.least(0);",
+									"  });",
+									"});",
+									"",
+									"",
+									"pm.test(\"Estado is a boolean value\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    responseData.forEach(function(item) {",
+									"        pm.expect(item.estado).to.be.a('boolean');",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -31,6 +97,58 @@
 				},
 				{
 					"name": "saveClient",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Content-Type header is application/json\", function () {",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+									"});",
+									"",
+									"",
+									"pm.test(\"Validate the response body object properties\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData).to.have.property('id');",
+									"    pm.expect(responseData).to.have.property('nombre');",
+									"    pm.expect(responseData).to.have.property('genero');",
+									"    pm.expect(responseData).to.have.property('edad');",
+									"    pm.expect(responseData).to.have.property('identificacion');",
+									"    pm.expect(responseData).to.have.property('direccion');",
+									"    pm.expect(responseData).to.have.property('telefono');",
+									"    pm.expect(responseData).to.have.property('clientId');",
+									"    pm.expect(responseData).to.have.property('contrasenia');",
+									"    pm.expect(responseData).to.have.property('estado');",
+									"});",
+									"",
+									"",
+									"pm.test(\"Nombre is a non-empty string\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData.nombre).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Value should not be empty\");",
+									"});",
+									"",
+									"",
+									"pm.test(\"Edad is a non-negative integer\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData.edad).to.be.a('number');",
+									"    pm.expect(responseData.edad).to.be.at.least(0);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -143,13 +261,47 @@
 					"response": []
 				},
 				{
+					"name": "ReporteCuentas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/reportes?nombre=Jose%20Lema&inicio=2025-01-01&fin=2025-02-19",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"reportes"
+							],
+							"query": [
+								{
+									"key": "nombre",
+									"value": "Jose%20Lema"
+								},
+								{
+									"key": "inicio",
+									"value": "2025-01-01"
+								},
+								{
+									"key": "fin",
+									"value": "2025-02-19"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "saveCuentas",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"numeroCuenta\": \"C001\",\r\n    \"tipoCuenta\": \"AHORRO\",\r\n    \"saldoInicial\": 0,\r\n    \"estado\": true\r\n}",
+							"raw": "{\r\n    \"numeroCuenta\": \"585545\",\r\n    \"tipoCuenta\": \"CORRIENTE\",\r\n    \"saldoInicial\": 1000.0,\r\n    \"estado\": true,\r\n    \"cliente\": \"Jose Lema\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -215,7 +367,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8081/api/cuentas/2",
+							"raw": "http://localhost:8081/api/cuentas/6",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -224,7 +376,7 @@
 							"path": [
 								"api",
 								"cuentas",
-								"2"
+								"6"
 							]
 						}
 					},
@@ -262,7 +414,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"fecha\": \"19/02/2025\",\r\n    \"tipoMovimiento\": \"RETIRO\",\r\n    \"valor\": -100,\r\n    \"cuenta\": {\r\n        \"id\": 1\r\n    }\r\n}\r\n",
+							"raw": "{\r\n    \"fecha\": \"19/02/2025\",\r\n    \"tipoMovimiento\": \"RETIRO\",\r\n    \"valor\": -1000,\r\n    \"cuenta\": {\r\n        \"id\": 1\r\n    }\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -291,7 +443,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"id\": 4,\r\n    \"estado\": false\r\n}",
+							"raw": "{\r\n    \"id\": 4,\r\n    \"fecha\": \"19/02/2024\",\r\n    \"valor\": 1000,\r\n    \"cuenta\": {\r\n        \"id\": 2\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -299,15 +451,15 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/clientes",
+							"raw": "http://localhost:8081/api/movimientos",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8081",
 							"path": [
 								"api",
-								"clientes"
+								"movimientos"
 							]
 						}
 					},

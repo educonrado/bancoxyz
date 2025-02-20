@@ -1,0 +1,48 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: "rabbitmq"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - app-network
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+  ClientePersonaMicroservice:
+    build:
+      context: ./ClientePersonaMicroservice
+    container_name: "cliente-persona-microservice"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - rabbitmq
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=guest
+      - SPRING_RABBITMQ_PASSWORD=guest
+    networks:
+      - app-network
+    image: bancoxyz-clientepersonamicroservice
+
+  CuentasMovimientosMicroservice:
+    build:
+      context: ./CuentasMovimientosMicroservice
+    container_name: "cuenta-movimiento-microservice"
+    ports:
+      - "8081:8081"
+    depends_on:
+      - rabbitmq
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=guest
+      - SPRING_RABBITMQ_PASSWORD=guest
+    networks:
+      - app-network
+    image: bancoxyz-cuentasmovimientosmicroservice
+networks:
+  app-network:
+    driver: bridge

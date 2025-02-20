@@ -4,6 +4,7 @@
 
 package com.bancoxyz.clientepersona.microservice.controller;
 
+import com.bancoxyz.clientepersona.microservice.comunication.ProductorRabbitMQ;
 import com.bancoxyz.clientepersona.microservice.entity.Cliente;
 import com.bancoxyz.clientepersona.microservice.service.IClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ import java.util.Optional;
 public class ClienteController {
 
     @Autowired
+    private ProductorRabbitMQ productor;
+    @Autowired
     private IClienteService clienteService;
 
     @GetMapping
@@ -34,6 +37,7 @@ public class ClienteController {
     @PostMapping
     public ResponseEntity<Cliente> save(@RequestBody Cliente cliente) {
         try {
+            productor.enviarMensaje(cliente.toString());
             return new ResponseEntity<>(clienteService.save(cliente), HttpStatus.OK);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
