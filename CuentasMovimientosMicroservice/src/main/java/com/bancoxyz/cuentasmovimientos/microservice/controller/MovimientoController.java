@@ -4,8 +4,8 @@
 
 package com.bancoxyz.cuentasmovimientos.microservice.controller;
 
-import com.bancoxyz.cuentasmovimientos.microservice.entity.Cuenta;
 import com.bancoxyz.cuentasmovimientos.microservice.entity.Movimiento;
+import com.bancoxyz.cuentasmovimientos.microservice.exception.SaldoException;
 import com.bancoxyz.cuentasmovimientos.microservice.service.ICuentaService;
 import com.bancoxyz.cuentasmovimientos.microservice.service.IMovimientoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/movimientos")
@@ -40,6 +38,8 @@ public class MovimientoController {
     public ResponseEntity<Movimiento> save(@RequestBody Movimiento movimiento) {
         try {
             return new ResponseEntity<>(movimientoService.save(movimiento), HttpStatus.CREATED);
+        } catch (SaldoException e) {
+            return (ResponseEntity<Movimiento>) handleSaldoException(e);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -74,8 +74,20 @@ public class MovimientoController {
             }
 
             return ResponseEntity.notFound().build();
+        } catch (SaldoException e) {
+            return (ResponseEntity<Movimiento>) handleSaldoException(e);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @ExceptionHandler(SaldoException.class)
+    public ResponseEntity<?> handleSaldoException(SaldoException e) {
+        Map<String, String> response = new HashMap<>();
+        response.put("error", e.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(response);
     }
 }

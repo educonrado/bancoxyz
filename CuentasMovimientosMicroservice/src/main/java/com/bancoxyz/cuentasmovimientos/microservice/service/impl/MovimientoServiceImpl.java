@@ -2,6 +2,7 @@ package com.bancoxyz.cuentasmovimientos.microservice.service.impl;
 
 import com.bancoxyz.cuentasmovimientos.microservice.entity.Cuenta;
 import com.bancoxyz.cuentasmovimientos.microservice.entity.Movimiento;
+import com.bancoxyz.cuentasmovimientos.microservice.exception.SaldoException;
 import com.bancoxyz.cuentasmovimientos.microservice.repository.IMovimientoRepository;
 import com.bancoxyz.cuentasmovimientos.microservice.service.ICuentaService;
 import com.bancoxyz.cuentasmovimientos.microservice.service.IMovimientoService;
@@ -22,30 +23,30 @@ public class MovimientoServiceImpl implements IMovimientoService {
     private ICuentaService cuentaService;
 
     @Override
-    public Movimiento save(Movimiento movimiento) {
+    public Movimiento save(Movimiento movimiento) throws SaldoException {
         try {
             actualizarSaldoDisponible(movimiento);
             return movimientoRepository.save(movimiento);
+        } catch (SaldoException e) {
+            throw new SaldoException(e.getMessage());
         } catch (Exception e) {
             LOGGER.severe(String.format("Error al guardar movimiento. %s", e));
             throw new RuntimeException("Error al guardar movimiento", e);
         }
     }
 
-    private void actualizarSaldoDisponible(Movimiento movimiento) {
+    private void actualizarSaldoDisponible(Movimiento movimiento) throws SaldoException {
         Cuenta cuenta = movimiento.getCuenta();
         Optional<Cuenta> cuentaOpt = cuentaService.getCuentaById(cuenta.getId());
         if (cuentaOpt.isPresent()) {
             cuenta = cuentaOpt.get();
             Double saldoDisponibleActualizar = Double.sum(cuenta.getSaldoInicial(), movimiento.getValor());
-            System.out.println(saldoDisponibleActualizar);
-            System.out.println(movimiento.getSaldo());
-            System.out.println(cuenta.getSaldoInicial());
-            movimiento.setSaldo(saldoDisponibleActualizar);
-            cuenta.setSaldoInicial(saldoDisponibleActualizar);
-            System.out.println(saldoDisponibleActualizar);
-            System.out.println(movimiento.getSaldo());
-            System.out.println(cuenta.getSaldoInicial());
+            if (saldoDisponibleActualizar >= 0) {
+                movimiento.setSaldo(saldoDisponibleActualizar);
+                cuenta.setSaldoInicial(saldoDisponibleActualizar);
+            } else {
+                throw new SaldoException("Saldo no disponible");
+            }
         } else {
             throw new RuntimeException("Cuenta no encontrada");
         }

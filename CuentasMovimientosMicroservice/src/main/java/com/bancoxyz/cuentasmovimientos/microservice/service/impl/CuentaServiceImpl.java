@@ -10,6 +10,7 @@ import com.bancoxyz.cuentasmovimientos.microservice.service.ICuentaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -24,6 +25,7 @@ public class CuentaServiceImpl implements ICuentaService {
 
     /**
      * TODO: Crear lógica de creación de números de cuenta para que no sea un valor pasado sino autogenerado.
+     *
      * @param cuenta
      * @return
      */
@@ -65,5 +67,16 @@ public class CuentaServiceImpl implements ICuentaService {
             LOGGER.severe(String.format("Error al buscar cuenta por id. %s", e));
             throw new RuntimeException("Error al buscar cuenta por id", e);
         }
+    }
+
+    @Override
+    public List<Cuenta> reporteEstadoCuenta(String nombreCliente, LocalDate fechaInicio, LocalDate fechaFin) {
+        try {
+            return cuentaRepository.reporteEstadoCuenta(nombreCliente, fechaInicio, fechaFin);
+        } catch (Exception e) {
+            LOGGER.severe(String.format("No se puede generar el reporte solicitad. %s", e));
+            throw new RuntimeException("No se puede generar el reporte solicitad", e);
+        }
+
     }
 }

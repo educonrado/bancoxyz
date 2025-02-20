@@ -6,6 +6,7 @@ package com.bancoxyz.cuentasmovimientos.microservice.service;
 
 import com.bancoxyz.cuentasmovimientos.microservice.entity.Cuenta;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,4 +16,5 @@ public interface ICuentaService {
     public void delete(Long id);
     public List<Cuenta> getAll();
     public Optional<Cuenta> getCuentaById(Long id);
+    public List<Cuenta> reporteEstadoCuenta(String nombreCliente, LocalDate fechaInicio, LocalDate fechaFin);
 }
